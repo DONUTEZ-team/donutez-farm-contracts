@@ -1,32 +1,21 @@
 { parameter
     (or (or (unit %claim) (nat %stake)) (or (pair %stakeFor address nat) (nat %unstake))) ;
   storage
-    (pair (nat %totalStaked)
-          (pair (nat %rewardPerShare)
-                (pair (timestamp %lastUpdateTime)
-                      (pair (big_map %ledger
-                               address
-                               (pair (nat %staked) (pair (nat %reward) (nat %lastRewardPerShare))))
-                            (pair %yfParams
-                               (address %lpToken)
-                               (pair %miningParams
-                                  (address %rewardToken)
-                                  (pair (nat %lifetime) (pair (nat %periodInSeconds) (nat %rewardPerPeriod))))))))) ;
+    (pair (nat %total_staked)
+          (pair (nat %share_reward)
+                (pair (timestamp %last_updated)
+                      (pair (big_map %ledger address (pair (nat %staked) (pair (nat %reward) (nat %former))))
+                            (pair %yf_params
+                               (address %lp_token)
+                               (pair %mining_params
+                                  (address %reward_token)
+                                  (pair (nat %lifetime) (pair (nat %period_in_seconds) (nat %reward_per_period))))))))) ;
   code { LAMBDA
-           (pair nat
-                 (pair nat
-                       (pair timestamp
-                             (pair (big_map address (pair nat (pair nat nat)))
-                                   (pair address (pair address (pair nat (pair nat nat))))))))
+           address
            (contract (pair address (pair address nat)))
-           { CDR ;
-             CDR ;
-             CDR ;
-             CDR ;
-             CAR ;
-             CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+           { CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
              IF_NONE
-               { PUSH string "getYFLPTokenTransferEntrypoint not found" ; FAILWITH }
+               { PUSH string "Common/token-transfer-entrypoint-not-found" ; FAILWITH }
                {} } ;
          LAMBDA
            (pair address
@@ -166,13 +155,7 @@
                                                         (pair (big_map address (pair nat (pair nat nat)))
                                                               (pair address (pair address (pair nat (pair nat nat)))))))))
                                 (pair nat (pair nat nat))))
-                       (lambda
-                          (pair nat
-                                (pair nat
-                                      (pair timestamp
-                                            (pair (big_map address (pair nat (pair nat nat)))
-                                                  (pair address (pair address (pair nat (pair nat nat))))))))
-                          (contract (pair address (pair address nat)))))
+                       (lambda address (contract (pair address (pair address nat)))))
                  (pair (pair address address)
                        (pair nat
                              (pair nat
@@ -315,6 +298,11 @@
              SWAP ;
              DUP ;
              DUG 2 ;
+             CDR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             CAR ;
              DIG 6 ;
              SWAP ;
              EXEC ;
@@ -335,9 +323,7 @@
          SWAP ;
          CAR ;
          IF_LEFT
-           { DIG 5 ;
-             DROP ;
-             IF_LEFT
+           { IF_LEFT
                { DROP ;
                  SWAP ;
                  DROP ;
@@ -403,7 +389,7 @@
                  CAR ;
                  COMPARE ;
                  EQ ;
-                 IF { PAIR }
+                 IF { DIG 3 ; DROP ; PAIR }
                     { SWAP ;
                       DIG 2 ;
                       DUP ;
@@ -414,10 +400,9 @@
                       CDR ;
                       CDR ;
                       CAR ;
-                      CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
-                      IF_NONE
-                        { PUSH string "getYFRewardTokenTransferEntrypoint not found" ; FAILWITH }
-                        {} ;
+                      DIG 4 ;
+                      SWAP ;
+                      EXEC ;
                       PUSH mutez 0 ;
                       DIG 3 ;
                       DUP ;
@@ -484,6 +469,8 @@
                  CDR ;
                  PAIR }
                { DIG 3 ;
+                 DROP ;
+                 DIG 3 ;
                  DROP ;
                  DIG 3 ;
                  DROP ;
@@ -633,6 +620,11 @@
                  SWAP ;
                  DUP ;
                  DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
                  DIG 4 ;
                  SWAP ;
                  EXEC ;
