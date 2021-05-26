@@ -22,6 +22,7 @@ type yf_storage is [@layout:comb] record [
   last_updated          : timestamp;
   ledger                : big_map(address, yf_account);
   yf_params             : deploy_yf_params;
+  yf_constructor        : address;
 ]
 
 type transfer_params is michelson_pair(address, "from", michelson_pair(address, "to", nat, "value"), "")

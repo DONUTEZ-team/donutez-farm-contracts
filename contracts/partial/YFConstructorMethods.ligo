@@ -82,6 +82,7 @@ function deploy_yf(const deploy_params : deploy_yf_params; const deploy_stake_pa
       last_updated = Tezos.now;
       ledger = (big_map [] : big_map(address, yf_account));
       yf_params = deploy_params;
+      yf_constructor = Tezos.self_address;
     ];
     const result : (operation * address) = deploy_contract((None : option(key_hash)), 0mutez, yf_initial_storage);
 

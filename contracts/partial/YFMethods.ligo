@@ -9,7 +9,7 @@ function get_account(const user : address; const s : yf_storage) : yf_account is
         reward = 0n;
         former = 0n;
       ]
-    end
+    end;
   } with acc
 
 function update_rewards(var s : yf_storage) : yf_storage is
@@ -34,36 +34,40 @@ function stake_(const addr : address; const this : address; const value : nat; c
   block {
     s := update_rewards(s);
 
-    var operations := no_operations;
     var acc : yf_account := get_account(addr, s);
 
-    acc.reward := acc.reward + (acc.staked * abs(s.share_reward - acc.former));
+    acc.reward := acc.reward + abs(acc.staked * s.share_reward - acc.former);
     acc.staked := acc.staked + value;
+    acc.former := acc.staked * s.share_reward;
 
     s.ledger[addr] := acc;
     s.total_staked := s.total_staked + value;
-
-    operations := Tezos.transaction(
+  } with (list [
+    Tezos.transaction(
       TransferType(addr, (this, value)),
       0mutez,
       get_token_transfer_entrypoint(s.yf_params.lp_token)
-    ) # operations;
-  } with (operations, s)
+    )
+  ], s)
 
 function stake(const value : nat; var s : yf_storage) : yf_return is
   stake_(Tezos.sender, Tezos.self_address, value, s)
 
 function stake_for(const addr : address; const value : nat; const s : yf_storage) : yf_return is
-  stake_(addr, Tezos.self_address, value, s)
+  block {
+    if Tezos.sender =/= s.yf_constructor then
+      failwith("YF/not-yf-constructor")
+    else
+      skip;
+  } with stake_(addr, Tezos.self_address, value, s)
 
 function unstake(var value : nat; var s : yf_storage) : yf_return is
   block {
     s := update_rewards(s);
 
-    var operations := no_operations;
     var acc : yf_account := get_account(Tezos.sender, s);
 
-    acc.reward := acc.reward + (acc.staked * abs(s.share_reward - acc.former));
+    acc.reward := acc.reward + abs(acc.staked * s.share_reward - acc.former);
 
     if value = 0n then
       value := acc.staked
@@ -73,19 +77,20 @@ function unstake(var value : nat; var s : yf_storage) : yf_return is
     if value <= acc.staked then
       skip
     else
-      failwith("Staked balance too low");
+      failwith("YF/staked-balance-too-low");
 
     acc.staked := abs(acc.staked - value);
+    acc.former := acc.staked * s.share_reward;
 
     s.ledger[Tezos.sender] := acc;
     s.total_staked := abs(s.total_staked - value);
-
-    operations := Tezos.transaction(
+  } with (list [
+    Tezos.transaction(
       TransferType(Tezos.self_address, (Tezos.sender, value)),
       0mutez,
       get_token_transfer_entrypoint(s.yf_params.lp_token)
-    ) # operations;
-  } with (operations, s)
+    )
+  ], s)
 
 function claim(var s : yf_storage) : yf_return is
   block {
@@ -94,8 +99,8 @@ function claim(var s : yf_storage) : yf_return is
     var operations := no_operations;
     var acc : yf_account := get_account(Tezos.sender, s);
 
-    acc.reward := acc.reward + (acc.staked * abs(s.share_reward - acc.former));
-    acc.former := s.share_reward;
+    acc.reward := acc.reward + abs(acc.staked * s.share_reward - acc.former);
+    acc.former := acc.staked * s.share_reward;
 
     if acc.reward = 0n then
       skip
@@ -105,6 +110,7 @@ function claim(var s : yf_storage) : yf_return is
         0mutez,
         get_token_transfer_entrypoint(s.yf_params.mining_params.reward_token)
       ) # operations;
+
       acc.reward := 0n;
     };
 
