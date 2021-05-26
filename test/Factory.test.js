@@ -12,7 +12,7 @@ contract("FactoryFA12", async () => {
     },
   });
   before("setup", async () => {
-    fInstance = await FactoryFA12.deployed();
+    fInstance = await tezos.contract.at(FactoryFA12.address);
   });
 
   describe("launchToken", async () => {

@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 module.exports = {
   alice: {
     pkh: "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
@@ -9,9 +11,8 @@ module.exports = {
     sk: "edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt",
     pk: "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
   },
-  oleh: {
-    pkh: "tz1WBSTvfSC58wjHGsPeYkcftmbgscUybNuk",
-    sk: "edskS3DCtGJsveC5MLQarnzEaWnLTsPHhqDediHEPadoJWT1PLLHQzwgnP4uttw7Hme9kzHiXjqq9XwNX4Ff94mXH61RFD5dCG",
-    pk: "edpkuELgzuP1GerfQ9MtzrH1g3WwreHTWT4AnhtyqFyfa4CSRjJYw4",
+  dev: {
+    pkh: process.env.DEV_PKH,
+    sk: process.env.DEV_SK,
   },
 };

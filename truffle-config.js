@@ -1,7 +1,13 @@
-const { alice } = require("./scripts/sandbox/accounts");
+require("dotenv").config();
+require("ts-node").register({
+  files: true,
+});
+
+const { alice, dev } = require("./scripts/sandbox/accounts");
 
 module.exports = {
   contracts_directory: "./contracts/main",
+
   networks: {
     development: {
       host: "http://localhost",
@@ -10,17 +16,11 @@ module.exports = {
       secretKey: alice.sk,
       type: "tezos",
     },
-    delphinet: {
-      host: "https://delphinet.smartpy.io",
+    florencenet: {
+      host: "https://testnet-tezos.giganode.io",
       port: 443,
       network_id: "*",
-      secretKey: "edskS3DCtGJsveC5MLQarnzEaWnLTsPHhqDediHEPadoJWT1PLLHQzwgnP4uttw7Hme9kzHiXjqq9XwNX4Ff94mXH61RFD5dCG",
-      type: "tezos",
-    },
-    carthagenet: {
-      host: "https://carthagenet.smartpy.io",
-      port: 443,
-      network_id: "*",
+      secretKey: dev.sk,
       type: "tezos",
     },
     mainnet: {
@@ -29,11 +29,9 @@ module.exports = {
       network_id: "*",
       type: "tezos",
     },
-    zeronet: {
-      host: "https://zeronet.smartpy.io",
-      port: 443,
-      network_id: "*",
-      type: "tezos",
-    },
+  },
+
+  mocha: {
+    timeout: 5000000,
   },
 };

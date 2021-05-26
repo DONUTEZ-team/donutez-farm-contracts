@@ -8,7 +8,7 @@ const getLigo = (isDockerizedLigo) => {
   let path = "ligo";
 
   if (isDockerizedLigo) {
-    path = "docker run -v $PWD:$PWD --rm -i ligolang/ligo:next";
+    path = "docker run -v $PWD:$PWD --rm -i ligolang/ligo:0.9.0";
 
     try {
       execSync(`${path}  --help`);
@@ -22,7 +22,7 @@ const getLigo = (isDockerizedLigo) => {
       execSync(`${path}  --help`);
     } catch (err) {
       console.log("Trying to use dockerized version...");
-      path = "docker run -v $PWD:$PWD --rm -i ligolang/ligo:next";
+      path = "docker run -v $PWD:$PWD --rm -i ligolang/ligo:0.9.0";
       execSync(`${path}  --help`);
     }
   }
@@ -99,7 +99,7 @@ program
       options.json,
       options.dockerized_ligo
     );
-});
+  });
 
 program
   .command("build-FA2-token")
@@ -119,6 +119,6 @@ program
       options.json,
       options.dockerized_ligo
     );
-});
+  });
 
 program.parse(process.argv);

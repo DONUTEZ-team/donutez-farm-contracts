@@ -165,7 +165,7 @@ contract("YFConstructor", async () => {
     assert.strictEqual(dtzToken.address, storage.dtzToken);
   });
 
-  it("shoud deploy YF and stake with less comission for deployiong", async () => {
+  it("shoud deploy YF and stake with less commission for deployiong", async () => {
     const instance = await YFConstructor.deployed();
     const storage = await instance.storage();
     const lpTokenAddress = "tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg";

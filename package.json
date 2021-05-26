@@ -1,33 +1,42 @@
 {
-  "name": "tezos_hackaton_2021",
+  "name": "donutez_farm",
   "version": "0.0.1",
-  "description": "Tezos Hackaton 2021",
+  "description": "Donutez Farm",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@taquito/michelson-encoder": "^8.0.3-beta.0",
-    "@taquito/signer": "^8.0.4-beta.0",
-    "@taquito/taquito": "^7.1.0-beta.0",
+    "@taquito/michelson-encoder": "^9.0.1",
+    "@taquito/rpc": "^9.0.1",
+    "@taquito/signer": "^9.0.1",
+    "@taquito/taquito": "^9.0.1",
     "child_process": "^1.0.2",
-    "commander": "^7.0.0",
-    "dotenv": "^8.2.0",
+    "commander": "^7.2.0",
+    "dotenv": "^10.0.0",
     "fs": "^0.0.1-security",
     "ganache-cli": "6.11.0-tezos.0",
-    "truffle": "^5.5.0-tezos.4"
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0",
+    "truffle": "5.5.0-tezos.4",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.2.4"
   },
   "scripts": {
-    "start-sandbox": "ganache-cli --flavor tezos --seed alice",
-    "compile-yf": "node scripts/cli.js build-yf --no-json -o contracts/main",
-    "compile-FA12-token": "node scripts/cli.js build-FA12-token --no-json -o contracts/main",
-    "compile-FA2-token": "node scripts/cli.js build-FA2-token --no-json -o contracts/main"
+    "postinstall": "patch-package",
+    "clean": "rm -rf ./build ./output",
+    "start-sandbox": "docker run --rm --name my-sandbox -e flextesa_node_cors_origin='*' --detach -p 8732:20000 tqtezos/flextesa:20210316 flobox start",
+    "test": "yarn compile && yarn truffle test --bail",
+    "compile-yf": "node scripts/cli.js build-yf --no-json -o contracts/compiled",
+    "compile-FA12-token": "node scripts/cli.js build-FA12-token --no-json -o contracts/compiled",
+    "compile-FA2-token": "node scripts/cli.js build-FA2-token --no-json -o contracts/compiled",
+    "compile": "yarn clean && yarn truffle compile",
+    "full-compile": "yarn clean && yarn compile-yf && yarn compile-FA12-token && yarn compile-FA2-token && yarn truffle compile",
+    "migrate": "yarn clean && yarn truffle migrate",
+    "migrate-florencenet": "yarn clean && yarn truffle migrate --network florencenet"
   },
-  "keywords": [
-    "tezos",
-    "ligo",
-    "blockchain",
-    "truffle",
-    "tezos_ukraine",
-    "tezos_israel"
-  ],
-  "author": "Sergey Makov <makov.sergey.it@gmail.com>"
+  "keywords": [],
+  "author": "Sergey Makov <makov.sergey.it@gmail.com> and Oleh Rubanik <geriys12@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smak0v/donutez_farm.git"
+  }
 }

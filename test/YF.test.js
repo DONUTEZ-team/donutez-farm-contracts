@@ -5,7 +5,7 @@ const accounts = require("../scripts/sandbox/accounts");
 
 const { MichelsonMap } = require("@taquito/michelson-encoder");
 
-const { bakeBlocks } = require("./utils/bakeBlocks");
+const { bakeBlocks } = require("./helpers/utils");
 
 contract("YF", async () => {
   var lpToken;
