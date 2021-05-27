@@ -4,12 +4,12 @@ const { dev } = require("../scripts/sandbox/accounts");
 
 module.exports = {
   admin: dev.pkh,
-  dtzToken: "tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg",
-  dtzYF: "tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg",
-  deployFee: {
-    deployFee: "10",
-    deployAndStakeFee: "5",
-    minStakeAmount: "5",
+  dtz_token: "tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg",
+  dtz_yf: "tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg",
+  deploy_fee: {
+    deploy_fee: "10",
+    deploy_and_stake_fee: "5",
+    min_stake_amount: "5",
   },
-  yieldFarmings: new MichelsonMap(),
+  yield_farmings: new MichelsonMap(),
 };

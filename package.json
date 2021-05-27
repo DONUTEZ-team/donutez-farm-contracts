@@ -27,9 +27,8 @@
     "test": "yarn compile && yarn truffle test --bail",
     "compile-yf": "node scripts/cli.js build-yf --no-json -o contracts/compiled",
     "compile-FA12-token": "node scripts/cli.js build-FA12-token --no-json -o contracts/compiled",
-    "compile-FA2-token": "node scripts/cli.js build-FA2-token --no-json -o contracts/compiled",
     "compile": "yarn clean && yarn truffle compile",
-    "full-compile": "yarn clean && yarn compile-yf && yarn compile-FA12-token && yarn compile-FA2-token && yarn truffle compile",
+    "full-compile": "yarn clean && yarn compile-yf && yarn compile-FA12-token && yarn truffle compile",
     "migrate": "yarn clean && yarn truffle migrate",
     "migrate-florencenet": "yarn clean && yarn truffle migrate --network florencenet"
   },

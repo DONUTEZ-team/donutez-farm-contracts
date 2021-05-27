@@ -101,24 +101,4 @@ program
     );
   });
 
-program
-  .command("build-FA2-token")
-  .description("builds FA2 token contract")
-  .option("-o, --output_dir <dir>", "Where store builds", "build")
-  .option("-i, --input_dir <dir>", "Where files are located", "contracts/main")
-  .option("-j, --no-json", "The format of output file")
-  .option("-g, --no-dockerized_ligo", "Switch to global ligo")
-  .action(function (options) {
-    let contractName = `FA2`;
-
-    exec("mkdir -p " + options.output_dir);
-    buildContract(
-      contractName,
-      options.input_dir,
-      options.output_dir,
-      options.json,
-      options.dockerized_ligo
-    );
-  });
-
 program.parse(process.argv);
