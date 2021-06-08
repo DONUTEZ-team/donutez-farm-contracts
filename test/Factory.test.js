@@ -1,100 +1,71 @@
+const { TezosToolkit } = require("@taquito/taquito");
+const { InMemorySigner } = require("@taquito/signer");
 const { MichelsonMap } = require("@taquito/michelson-encoder");
 
-const { oleh } = require("../scripts/sandbox/accounts");
+const { strictEqual } = require("assert");
 
-const FactoryFA12 = artifacts.require("FactoryFA12");
-const FactoryFA2 = artifacts.require("FactoryFA2");
+const { confirmOperation } = require("./helpers/confirmation");
 
-contract("FactoryFA12", async () => {
-  tezos.setProvider({
-    config: {
-      confirmationPollingTimeoutSecond: 1500,
-    },
-  });
+const { alice } = require("../scripts/sandbox/accounts");
+
+const TokenFactoryFA12 = artifacts.require("TokenFactoryFA12");
+
+contract.only("TokenFactoryFA12", async () => {
   before("setup", async () => {
-    fInstance = await tezos.contract.at(FactoryFA12.address);
-  });
-
-  describe("launchToken", async () => {
-    it("set a new Fa12Token", async () => {
-      const amount = 4000000;
-
-      await fInstance.main(amount);
-
-      const fStorage = await fInstance.storage();
-      var value = await fStorage.tokenList.get(oleh.pkh);
-
-      console.log(value);
+    tezos = new TezosToolkit(tezos.rpc.url);
+    tezos.setProvider({
+      config: {
+        confirmationPollingTimeoutSecond:
+          process.env.CONFIRMATION_POLLING_TIMEOUT_SECOND,
+      },
+      signer: await InMemorySigner.fromSecretKey(alice.sk),
     });
-  });
-});
 
-contract("FactoryFA2", async () => {
-  tezos.setProvider({
-    config: {
-      confirmationPollingTimeoutSecond: 1500,
-    },
-  });
-  before("setup", async () => {
-    const f2Storage = {
-      admin: "tz1TP5Are685mU29aAmTE6eBwRENwp1qhUdw",
-      owner: "tz1TP5Are685mU29aAmTE6eBwRENwp1qhUdw",
-      tokenList: new MichelsonMap(),
-    };
-
-    fInstance2 = await FactoryFA2.new(f2Storage);
+    factoryInstance = await tezos.contract.at(TokenFactoryFA12.address);
   });
 
-  describe("launchTokenFA2", async () => {
-    it("set a new FA2Token", async () => {
-      const amount = 4000000;
-      const tokenMD = MichelsonMap.fromLiteral({
-        [0]: {
-          token_id: "0",
-          extras: MichelsonMap.fromLiteral({
-            [0]: Buffer.from(
-              JSON.stringify({
-                name: "Donutez Token",
-                authors: ["DONUTEZ TEAM"],
-              })
-            ).toString("hex"),
-          }),
-        },
-      });
-      const MD = MichelsonMap.fromLiteral({
-        [""]: Buffer.from("tezos-storage:here", "ascii").toString("hex"),
-        here: Buffer.from(
-          JSON.stringify({
-            version: "v0.0.1",
-            description: "Donutez Token",
-            name: "Donutez Token",
-            authors: ["DONUTEZ TEAM"],
-            source: {
-              tools: ["Ligo", "Flextesa"],
-              location: "https://ligolang.org/",
-            },
-            interfaces: ["TZIP-12", "TZIP-16"],
-            errors: [],
-            views: [],
-            tokens: {
-              dynamic: [
-                {
-                  big_map: "tokenMD",
-                },
-              ],
-            },
-          }),
-          "ascii"
-        ).toString("hex"),
-      });
-
-      await fInstance2.main(amount, tokenMD, MD);
-
-      const fStorage = await fInstance2.storage();
-
-      var value = await fStorage.tokenList.get(oleh.pkh);
-
-      console.log(value);
+  it("deploy a new FA1.2 token", async () => {
+    const totalSupply = "100000000";
+    const metadata = MichelsonMap.fromLiteral({
+      "": Buffer("tezos-storage:token", "ascii").toString("hex"),
+      token: Buffer(
+        JSON.stringify({
+          version: "v1.0.0",
+          description: "Test Token",
+          authors: ["<test@gmail.com>"],
+          source: {
+            tools: ["Ligo", "Flextesa"],
+            location: "https://ligolang.org/",
+          },
+          interfaces: ["TZIP-7", "TZIP-16"],
+          errors: [],
+          views: [],
+        }),
+        "ascii"
+      ).toString("hex"),
     });
+    const tokenInfo = MichelsonMap.fromLiteral({
+      symbol: Buffer.from("TST").toString("hex"),
+      name: Buffer.from("Test").toString("hex"),
+      decimals: Buffer.from("6").toString("hex"),
+      icon: Buffer.from(
+        "ipfs://QmX6Tq7RRErP5B3GGnypHvzW6ZFA72Ug9ciaznS3a4BQQP"
+      ).toString("hex"),
+    });
+
+    let operation = await factoryInstance.methods
+      .default(totalSupply, metadata, tokenInfo)
+      .send();
+
+    await confirmOperation(tezos, operation.hash);
+
+    const storage = await factoryInstance.storage();
+    const userTokensCount = await storage.tokens_count.get(alice.pkh);
+    const tokens = await storage.tokens.get(alice.pkh);
+    const tokenAddress = await tokens.get("1");
+
+    strictEqual(userTokensCount.toNumber(), 2);
+
+    console.log("Test token address: ", tokenAddress);
   });
 });

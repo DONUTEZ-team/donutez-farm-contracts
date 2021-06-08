@@ -11,7 +11,6 @@ type token_metadata_info is [@layout:comb] record [
 ]
 
 type factory_storage is [@layout:comb] record [
-  owner                 : address;
   admin                 : address;
   tokens                : big_map(address, map(nat, address));
   tokens_count          : big_map(address, nat);
@@ -31,7 +30,7 @@ type token_storage is [@layout:comb] record [
 type launch_token_params is [@layout:comb] record [
   total_supply          : nat;
   metadata              : big_map(string, bytes);
-  token_metadata        : big_map(nat, token_metadata_info);
+  token_info            : map(string, bytes);
 ]
 
 type factory_return is list(operation) * factory_storage

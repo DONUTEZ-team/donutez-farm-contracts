@@ -45,22 +45,17 @@ module.exports = async (deployer, network, accounts) => {
       "ascii"
     ).toString("hex"),
   });
-  const tokenMetadata = MichelsonMap.fromLiteral({
-    0: {
-      token_id: "0",
-      token_info: MichelsonMap.fromLiteral({
-        symbol: Buffer.from("DTZ").toString("hex"),
-        name: Buffer.from("Donutez").toString("hex"),
-        decimals: Buffer.from("6").toString("hex"),
-        icon: Buffer.from(
-          "ipfs://QmX6Tq7RRErP5B3GGnypHvzW6ZFA72Ug9ciaznS3a4BQQP"
-        ).toString("hex"),
-      }),
-    },
+  const tokenInfo = MichelsonMap.fromLiteral({
+    symbol: Buffer.from("DTZ").toString("hex"),
+    name: Buffer.from("Donutez").toString("hex"),
+    decimals: Buffer.from("6").toString("hex"),
+    icon: Buffer.from(
+      "ipfs://QmX6Tq7RRErP5B3GGnypHvzW6ZFA72Ug9ciaznS3a4BQQP"
+    ).toString("hex"),
   });
 
   let operation = await tokenFactoryFA12Instance.methods
-    .default(totalSupply, metadata, tokenMetadata)
+    .default(totalSupply, metadata, tokenInfo)
     .send();
 
   await confirmOperation(tezos, operation.hash);
