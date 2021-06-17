@@ -15,19 +15,19 @@ function launch_token(const params : launch_token_params; var s : factory_storag
   block {
     const user : account = record [
       balance = params.total_supply;
-      allowances = s.allowances_tmp;
+      allowances = (Map.empty : map(address, nat));
     ];
 
-    s.ledger_tmp := (big_map [(Tezos.sender : address) -> (user : account)] : big_map(address, account));
     s.metadata_tmp := params.metadata;
+    s.token_info_tmp := params.token_info;
     s.token_metadata_tmp[0n] := record [
       token_id = 0n;
-      token_info = params.token_info;
+      token_info = s.token_info_tmp;
     ];
 
     const tok_storage : token_storage = record [
       total_supply = params.total_supply;
-      ledger = s.ledger_tmp;
+      ledger = (big_map [(Tezos.sender : address) -> (user : account)] : big_map(address, account));
       metadata = s.metadata_tmp;
       token_metadata = s.token_metadata_tmp;
     ];
@@ -51,4 +51,8 @@ function launch_token(const params : launch_token_params; var s : factory_storag
     | None -> s.tokens_count[Tezos.sender] := 1n
     | Some(value) -> s.tokens_count[Tezos.sender] := value + 1n
     end;
+
+    s.token_info_tmp := (Map.empty : map(string, bytes));
+    s.metadata_tmp := (Big_map.empty : big_map(string, bytes));
+    s.token_metadata_tmp := (Big_map.empty : big_map(token_id, token_metadata_info));
   } with (list [res.0], s)

@@ -12,6 +12,8 @@ const { dev, alice } = require("../scripts/sandbox/accounts");
 const YFConstructorStorage = require("../storage/YFConstructor");
 
 module.exports = async (deployer, network, accounts) => {
+  const signer = ["development"].includes(network) ? alice.pkh : dev.pkh;
+
   tezos = new TezosToolkit(tezos.rpc.url);
   tezos.setProvider({
     config: {
@@ -28,7 +30,7 @@ module.exports = async (deployer, network, accounts) => {
   );
   const totalSupply = "100000000"; // 100 DTZ
   const metadata = MichelsonMap.fromLiteral({
-    "": Buffer("tezos-storage:dtz", "ascii").toString("hex"),
+    "": Buffer.from("tezos-storage:dtz", "ascii").toString("hex"),
     dtz: Buffer(
       JSON.stringify({
         version: "v1.0.0",
@@ -59,6 +61,16 @@ module.exports = async (deployer, network, accounts) => {
     .send();
 
   await confirmOperation(tezos, operation.hash);
+
+  const tokenFactoryFA12Storage = await tokenFactoryFA12Instance.storage();
+  const tokensByDeployer = await tokenFactoryFA12Storage.tokens.get(signer);
+  const dtzTokenAddress = await tokensByDeployer.get("0");
+
+  console.log("DTZ token: ", dtzTokenAddress);
+
+  addToOutput("DTZ token", dtzTokenAddress, "APPEND");
+
+  YFConstructorStorage.dtz_token = dtzTokenAddress;
 
   operation = await tezos.contract.originate({
     code: JSON.parse(YFConstructor.michelson),

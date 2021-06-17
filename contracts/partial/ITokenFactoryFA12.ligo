@@ -14,10 +14,9 @@ type factory_storage is [@layout:comb] record [
   admin                 : address;
   tokens                : big_map(address, map(nat, address));
   tokens_count          : big_map(address, nat);
-  allowances_tmp        : map(address, nat);
-  ledger_tmp            : big_map(address, account);
   metadata_tmp          : big_map(string, bytes);
   token_metadata_tmp    : big_map(token_id, token_metadata_info);
+  token_info_tmp        : map(string, bytes);
 ]
 
 type token_storage is [@layout:comb] record [

@@ -27,7 +27,7 @@ contract.only("TokenFactoryFA12", async () => {
   it("deploy a new FA1.2 token", async () => {
     const totalSupply = "100000000";
     const metadata = MichelsonMap.fromLiteral({
-      "": Buffer("tezos-storage:token", "ascii").toString("hex"),
+      "": Buffer.from("tezos-storage:token", "ascii").toString("hex"),
       token: Buffer(
         JSON.stringify({
           version: "v1.0.0",
