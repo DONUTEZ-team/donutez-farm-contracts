@@ -6,7 +6,9 @@ module.exports = {
   admin: dev.pkh,
   tokens: new MichelsonMap(),
   tokens_count: new MichelsonMap(),
-  metadata_tmp: new MichelsonMap(),
-  token_metadata_tmp: new MichelsonMap(),
-  token_info_tmp: new MichelsonMap(),
+  tmp1: new MichelsonMap(),
+  tmp2: new MichelsonMap(),
+  tmp3: new MichelsonMap(),
+  tmp4: new MichelsonMap(),
+  tmp5: new MichelsonMap(),
 };

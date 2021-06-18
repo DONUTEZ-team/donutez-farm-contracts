@@ -3,7 +3,6 @@ const TokenFactoryFA12 = artifacts.require("TokenFactoryFA12");
 
 const { TezosToolkit } = require("@taquito/taquito");
 const { InMemorySigner } = require("@taquito/signer");
-const { MichelsonMap } = require("@taquito/michelson-encoder");
 
 const { confirmOperation } = require("../test/helpers/confirmation");
 const { addToOutput } = require("./utils/add_to_output");
@@ -29,9 +28,9 @@ module.exports = async (deployer, network, accounts) => {
     TokenFactoryFA12.address
   );
   const totalSupply = "100000000"; // 100 DTZ
-  const metadata = MichelsonMap.fromLiteral({
+  const metadata = {
     "": Buffer.from("tezos-storage:dtz", "ascii").toString("hex"),
-    dtz: Buffer(
+    dtz: Buffer.from(
       JSON.stringify({
         version: "v1.0.0",
         description: "Donutez Token",
@@ -46,18 +45,35 @@ module.exports = async (deployer, network, accounts) => {
       }),
       "ascii"
     ).toString("hex"),
-  });
-  const tokenInfo = MichelsonMap.fromLiteral({
+  };
+  const tokenMetadata = {
     symbol: Buffer.from("DTZ").toString("hex"),
     name: Buffer.from("Donutez").toString("hex"),
     decimals: Buffer.from("6").toString("hex"),
     icon: Buffer.from(
       "ipfs://QmX6Tq7RRErP5B3GGnypHvzW6ZFA72Ug9ciaznS3a4BQQP"
     ).toString("hex"),
-  });
+  };
 
   let operation = await tokenFactoryFA12Instance.methods
-    .default(totalSupply, metadata, tokenInfo)
+    .default(
+      totalSupply,
+      [
+        ["", metadata[""]],
+        ["dtz", metadata["dtz"]],
+      ],
+      [
+        [
+          0,
+          [
+            ["symbol", tokenMetadata["symbol"]],
+            ["name", tokenMetadata["name"]],
+            ["decimals", tokenMetadata["decimals"]],
+            ["icon", tokenMetadata["icon"]],
+          ],
+        ],
+      ]
+    )
     .send();
 
   await confirmOperation(tezos, operation.hash);
@@ -66,9 +82,9 @@ module.exports = async (deployer, network, accounts) => {
   const tokensByDeployer = await tokenFactoryFA12Storage.tokens.get(signer);
   const dtzTokenAddress = await tokensByDeployer.get("0");
 
-  console.log("DTZ token: ", dtzTokenAddress);
-
   addToOutput("DTZ token", dtzTokenAddress, "APPEND");
+
+  console.log("DTZ token: ", dtzTokenAddress);
 
   YFConstructorStorage.dtz_token = dtzTokenAddress;
 
@@ -81,7 +97,7 @@ module.exports = async (deployer, network, accounts) => {
 
   YFConstructor.address = operation.contractAddress;
 
-  console.log("YFConstructor: ", operation.contractAddress);
+  addToOutput("YFConstructor", YFConstructor.address, "APPEND");
 
-  addToOutput("YFConstructor", operation.contractAddress, "APPEND");
+  console.log("YFConstructor: ", YFConstructor.address);
 };

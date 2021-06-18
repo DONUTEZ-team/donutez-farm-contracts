@@ -1,6 +1,5 @@
 const { TezosToolkit } = require("@taquito/taquito");
 const { InMemorySigner } = require("@taquito/signer");
-const { MichelsonMap } = require("@taquito/michelson-encoder");
 
 const { strictEqual } = require("assert");
 
@@ -26,9 +25,9 @@ contract.only("TokenFactoryFA12", async () => {
 
   it("deploy a new FA1.2 token", async () => {
     const totalSupply = "100000000";
-    const metadata = MichelsonMap.fromLiteral({
+    const metadata = {
       "": Buffer.from("tezos-storage:token", "ascii").toString("hex"),
-      token: Buffer(
+      token: Buffer.from(
         JSON.stringify({
           version: "v1.0.0",
           description: "Test Token",
@@ -43,18 +42,34 @@ contract.only("TokenFactoryFA12", async () => {
         }),
         "ascii"
       ).toString("hex"),
-    });
-    const tokenInfo = MichelsonMap.fromLiteral({
+    };
+    const tokenMetadata = {
       symbol: Buffer.from("TST").toString("hex"),
       name: Buffer.from("Test").toString("hex"),
       decimals: Buffer.from("6").toString("hex"),
       icon: Buffer.from(
         "ipfs://QmX6Tq7RRErP5B3GGnypHvzW6ZFA72Ug9ciaznS3a4BQQP"
       ).toString("hex"),
-    });
-
-    let operation = await factoryInstance.methods
-      .default(totalSupply, metadata, tokenInfo)
+    };
+    const operation = await factoryInstance.methods
+      .default(
+        totalSupply,
+        [
+          ["", metadata[""]],
+          ["token", metadata["token"]],
+        ],
+        [
+          [
+            0,
+            [
+              ["symbol", tokenMetadata["symbol"]],
+              ["name", tokenMetadata["name"]],
+              ["decimals", tokenMetadata["decimals"]],
+              ["icon", tokenMetadata["icon"]],
+            ],
+          ],
+        ]
+      )
       .send();
 
     await confirmOperation(tezos, operation.hash);
@@ -66,6 +81,26 @@ contract.only("TokenFactoryFA12", async () => {
 
     strictEqual(userTokensCount.toNumber(), 2);
 
-    console.log("Test token address: ", tokenAddress);
+    const testTokenInstance = await tezos.contract.at(tokenAddress);
+    const testStorage = await testTokenInstance.storage();
+    const testTokenMetadata = await testStorage.token_metadata.get("0");
+
+    strictEqual(
+      await testTokenMetadata.token_info.get("name"),
+      tokenMetadata["name"]
+    );
+    strictEqual(
+      await testTokenMetadata.token_info.get("symbol"),
+      tokenMetadata["symbol"]
+    );
+    strictEqual(
+      await testTokenMetadata.token_info.get("decimals"),
+      tokenMetadata["decimals"]
+    );
+    strictEqual(
+      await testTokenMetadata.token_info.get("icon"),
+      tokenMetadata["icon"]
+    );
+    strictEqual(testStorage.total_supply.toString(), totalSupply);
   });
 });
