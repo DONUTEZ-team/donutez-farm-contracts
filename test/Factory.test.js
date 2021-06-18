@@ -48,7 +48,7 @@ contract.only("TokenFactoryFA12", async () => {
       name: Buffer.from("Test").toString("hex"),
       decimals: Buffer.from("6").toString("hex"),
       icon: Buffer.from(
-        "ipfs://QmX6Tq7RRErP5B3GGnypHvzW6ZFA72Ug9ciaznS3a4BQQP"
+        "ipfs://QmT61Sqko5vGxwcUSMTaLMfrJLhei8StBUzpAVQqfCjwzC"
       ).toString("hex"),
     };
     const operation = await factoryInstance.methods
