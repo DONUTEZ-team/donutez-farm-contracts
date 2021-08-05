@@ -1,0 +1,411 @@
+{ parameter
+    (or (or (address %claim) (nat %stake))
+        (or (pair %stake_for (address %user) (nat %amount))
+            (pair %unstake (address %receiver) (nat %amount)))) ;
+  storage
+    (pair (big_map %ledger address (pair (nat %staked) (pair (nat %earned) (nat %prev_earned))))
+          (pair (address %staked_token)
+                (pair (address %reward_token)
+                      (pair (address %factory)
+                            (pair (nat %reward_per_period)
+                                  (pair (nat %period_in_blocks)
+                                        (pair (nat %lifetime) (pair (nat %staked) (pair (nat %upd) (nat %rps)))))))))) ;
+  code { LAMBDA
+           address
+           (contract (pair address (pair address nat)))
+           { CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+             IF_NONE
+               { PUSH string "Farming/FA1.2-token-transfer-entrypoint-404" ; FAILWITH }
+               {} } ;
+         LAMBDA
+           (pair address
+                 (pair (big_map address (pair nat (pair nat nat)))
+                       (pair address
+                             (pair address (pair address (pair nat (pair nat (pair nat (pair nat (pair nat nat))))))))))
+           (pair nat (pair nat nat))
+           { UNPAIR ;
+             SWAP ;
+             CAR ;
+             SWAP ;
+             GET ;
+             IF_NONE
+               { PUSH nat 0 ; PUSH nat 0 ; PUSH nat 0 ; SWAP ; PAIR ; SWAP ; PAIR }
+               {} } ;
+         LAMBDA
+           (pair (big_map address (pair nat (pair nat nat)))
+                 (pair address
+                       (pair address (pair address (pair nat (pair nat (pair nat (pair nat (pair nat nat)))))))))
+           (pair (big_map address (pair nat (pair nat nat)))
+                 (pair address
+                       (pair address (pair address (pair nat (pair nat (pair nat (pair nat (pair nat nat)))))))))
+           { LEVEL ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 17 ;
+             COMPARE ;
+             LT ;
+             IF { PUSH nat 0 ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  GET 15 ;
+                  COMPARE ;
+                  GT ;
+                  IF { DUP ;
+                       GET 17 ;
+                       LEVEL ;
+                       SUB ;
+                       ABS ;
+                       PUSH nat 1000000000000000000 ;
+                       DUP 3 ;
+                       GET 9 ;
+                       DIG 2 ;
+                       MUL ;
+                       MUL ;
+                       SWAP ;
+                       DUP ;
+                       DUP ;
+                       DUG 3 ;
+                       GET 15 ;
+                       DIG 2 ;
+                       EDIV ;
+                       IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                       CAR ;
+                       DIG 2 ;
+                       GET 18 ;
+                       ADD ;
+                       UPDATE 18 }
+                     {} ;
+                  LEVEL ;
+                  UPDATE 17 }
+                {} } ;
+         DUP 3 ;
+         DUP 3 ;
+         DUP 3 ;
+         PAIR 3 ;
+         LAMBDA
+           (pair (pair (lambda
+                          (pair (big_map address (pair nat (pair nat nat)))
+                                (pair address
+                                      (pair address (pair address (pair nat (pair nat (pair nat (pair nat (pair nat nat)))))))))
+                          (pair (big_map address (pair nat (pair nat nat)))
+                                (pair address
+                                      (pair address (pair address (pair nat (pair nat (pair nat (pair nat (pair nat nat))))))))))
+                       (pair (lambda
+                                (pair address
+                                      (pair (big_map address (pair nat (pair nat nat)))
+                                            (pair address
+                                                  (pair address (pair address (pair nat (pair nat (pair nat (pair nat (pair nat nat))))))))))
+                                (pair nat (pair nat nat)))
+                             (lambda address (contract (pair address (pair address nat))))))
+                 (pair (pair address address)
+                       (pair nat
+                             (pair (big_map address (pair nat (pair nat nat)))
+                                   (pair address
+                                         (pair address (pair address (pair nat (pair nat (pair nat (pair nat (pair nat nat))))))))))))
+           (pair (list operation)
+                 (pair (big_map address (pair nat (pair nat nat)))
+                       (pair address
+                             (pair address (pair address (pair nat (pair nat (pair nat (pair nat (pair nat nat))))))))))
+           { UNPAIR ;
+             UNPAIR 3 ;
+             DIG 3 ;
+             UNPAIR ;
+             UNPAIR ;
+             DIG 2 ;
+             UNPAIR ;
+             SWAP ;
+             DIG 4 ;
+             SWAP ;
+             EXEC ;
+             DUP ;
+             DUP 4 ;
+             PAIR ;
+             DIG 5 ;
+             SWAP ;
+             EXEC ;
+             DUP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             DUP 4 ;
+             GET 18 ;
+             DUP 4 ;
+             CAR ;
+             MUL ;
+             SUB ;
+             ABS ;
+             DIG 2 ;
+             GET 3 ;
+             ADD ;
+             UPDATE 3 ;
+             DUP ;
+             DUP 4 ;
+             DIG 2 ;
+             CAR ;
+             ADD ;
+             UPDATE 1 ;
+             DUP ;
+             DUP 3 ;
+             GET 18 ;
+             DIG 2 ;
+             CAR ;
+             MUL ;
+             UPDATE 4 ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             DIG 2 ;
+             DUP 5 ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             UPDATE 1 ;
+             DUP ;
+             DUP 3 ;
+             DIG 2 ;
+             GET 15 ;
+             ADD ;
+             UPDATE 15 ;
+             DUP ;
+             NIL operation ;
+             DIG 2 ;
+             GET 3 ;
+             DIG 6 ;
+             SWAP ;
+             EXEC ;
+             PUSH mutez 0 ;
+             DIG 4 ;
+             DIG 6 ;
+             PAIR ;
+             DIG 5 ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             PAIR } ;
+         SWAP ;
+         APPLY ;
+         DIG 4 ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DIG 2 ;
+                 DROP ;
+                 SWAP ;
+                 DIG 2 ;
+                 SWAP ;
+                 EXEC ;
+                 NIL operation ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SENDER ;
+                 PAIR ;
+                 DIG 4 ;
+                 SWAP ;
+                 EXEC ;
+                 PUSH nat 1000000000000000000 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 EDIV ;
+                 IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUP ;
+                 DUG 3 ;
+                 GET 4 ;
+                 DUP 6 ;
+                 GET 18 ;
+                 DUP 5 ;
+                 CAR ;
+                 MUL ;
+                 SUB ;
+                 ABS ;
+                 DIG 3 ;
+                 GET 3 ;
+                 ADD ;
+                 UPDATE 3 ;
+                 DUP ;
+                 DUP 5 ;
+                 GET 18 ;
+                 DIG 2 ;
+                 CAR ;
+                 MUL ;
+                 UPDATE 4 ;
+                 PUSH nat 0 ;
+                 DUP 3 ;
+                 COMPARE ;
+                 EQ ;
+                 IF { SWAP ; DIG 4 ; DIG 5 ; DROP 3 ; SWAP ; PAIR }
+                    { DUP ;
+                      PUSH nat 1000000000000000000 ;
+                      DUP 4 ;
+                      MUL ;
+                      DIG 2 ;
+                      GET 3 ;
+                      SUB ;
+                      ABS ;
+                      UPDATE 3 ;
+                      DIG 2 ;
+                      DUP 4 ;
+                      GET 5 ;
+                      DIG 6 ;
+                      SWAP ;
+                      EXEC ;
+                      PUSH mutez 0 ;
+                      DIG 4 ;
+                      DIG 6 ;
+                      PAIR ;
+                      SELF_ADDRESS ;
+                      PAIR ;
+                      TRANSFER_TOKENS ;
+                      CONS ;
+                      SWAP ;
+                      PUSH nat 0 ;
+                      UPDATE 3 ;
+                      SWAP ;
+                      PAIR } ;
+                 SWAP ;
+                 DUP ;
+                 CAR ;
+                 DUP 3 ;
+                 CDR ;
+                 SOME ;
+                 SENDER ;
+                 UPDATE ;
+                 UPDATE 1 ;
+                 SWAP ;
+                 CAR ;
+                 PAIR }
+               { DIG 3 ;
+                 DIG 4 ;
+                 DIG 5 ;
+                 DROP 3 ;
+                 PAIR ;
+                 SELF_ADDRESS ;
+                 SENDER ;
+                 PAIR ;
+                 PAIR ;
+                 EXEC } }
+           { IF_LEFT
+               { DIG 3 ;
+                 DIG 4 ;
+                 DIG 5 ;
+                 DROP 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 7 ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "Farming/not-factory" ; FAILWITH } {} ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 PAIR ;
+                 SELF_ADDRESS ;
+                 DIG 2 ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 EXEC }
+               { DIG 2 ;
+                 DROP ;
+                 SWAP ;
+                 DIG 2 ;
+                 SWAP ;
+                 EXEC ;
+                 DUP ;
+                 SENDER ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DUP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 4 ;
+                 DUP 4 ;
+                 GET 18 ;
+                 DUP 4 ;
+                 CAR ;
+                 MUL ;
+                 SUB ;
+                 ABS ;
+                 DIG 2 ;
+                 GET 3 ;
+                 ADD ;
+                 UPDATE 3 ;
+                 PUSH nat 0 ;
+                 DUP 4 ;
+                 CDR ;
+                 COMPARE ;
+                 EQ ;
+                 IF { DUP ; CAR } { DUP 3 ; CDR } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 COMPARE ;
+                 LE ;
+                 IF {} { PUSH string "Farming/low-staked-balance" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DIG 3 ;
+                 CAR ;
+                 SUB ;
+                 ABS ;
+                 UPDATE 1 ;
+                 DUP ;
+                 DUP 4 ;
+                 GET 18 ;
+                 DIG 2 ;
+                 CAR ;
+                 MUL ;
+                 UPDATE 4 ;
+                 DIG 2 ;
+                 DUP ;
+                 CAR ;
+                 DIG 2 ;
+                 SOME ;
+                 SENDER ;
+                 UPDATE ;
+                 UPDATE 1 ;
+                 DUP ;
+                 DUP 3 ;
+                 DIG 2 ;
+                 GET 15 ;
+                 SUB ;
+                 ABS ;
+                 UPDATE 15 ;
+                 DUP ;
+                 NIL operation ;
+                 DIG 2 ;
+                 GET 3 ;
+                 DIG 5 ;
+                 SWAP ;
+                 EXEC ;
+                 PUSH mutez 0 ;
+                 DIG 4 ;
+                 DIG 5 ;
+                 CAR ;
+                 PAIR ;
+                 SELF_ADDRESS ;
+                 PAIR ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 PAIR } } } }
+

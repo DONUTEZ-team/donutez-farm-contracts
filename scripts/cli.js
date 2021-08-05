@@ -8,7 +8,7 @@ const getLigo = (isDockerizedLigo) => {
   let path = "ligo";
 
   if (isDockerizedLigo) {
-    path = "docker run -v $PWD:$PWD --rm -i ligolang/ligo:0.9.0";
+    path = "docker run -v $PWD:$PWD --rm -i ligolang/ligo:0.20.0";
 
     try {
       execSync(`${path}  --help`);
@@ -22,7 +22,7 @@ const getLigo = (isDockerizedLigo) => {
       execSync(`${path}  --help`);
     } catch (err) {
       console.log("Trying to use dockerized version...");
-      path = "docker run -v $PWD:$PWD --rm -i ligolang/ligo:0.9.0";
+      path = "docker run -v $PWD:$PWD --rm -i ligolang/ligo:0.20.0";
       execSync(`${path}  --help`);
     }
   }
@@ -62,14 +62,14 @@ const buildContract = (
 program.version("0.1.0");
 
 program
-  .command("build-yf")
-  .description("builds YF contract")
+  .command("build-farming")
+  .description("builds Yield Farming contract")
   .option("-o, --output_dir <dir>", "Where store builds", "build")
   .option("-i, --input_dir <dir>", "Where files are located", "contracts/main")
   .option("-j, --no-json", "The format of output file")
   .option("-g, --no-dockerized_ligo", "Switch to global ligo")
   .action(function (options) {
-    let contractName = `YF`;
+    let contractName = `farming`;
 
     exec("mkdir -p " + options.output_dir);
     buildContract(
@@ -82,14 +82,14 @@ program
   });
 
 program
-  .command("build-FA12-token")
+  .command("build-fa12-token")
   .description("builds FA12 token contract")
   .option("-o, --output_dir <dir>", "Where store builds", "build")
   .option("-i, --input_dir <dir>", "Where files are located", "contracts/main")
   .option("-j, --no-json", "The format of output file")
   .option("-g, --no-dockerized_ligo", "Switch to global ligo")
   .action(function (options) {
-    let contractName = `FA12`;
+    let contractName = `fa12`;
 
     exec("mkdir -p " + options.output_dir);
     buildContract(
